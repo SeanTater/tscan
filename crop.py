@@ -1,4 +1,4 @@
-from common import Command, Image
+from common import Filter, ImageMeta
 import cv2
 import collections
 import math
@@ -7,32 +7,37 @@ class Crop(Filter):
     __description__ = "Automatically crop a scan to the image it contains"
     @classmethod
     def arguments(cls, parser):
-        parser.add_argument("--warp", default=16,
+        parser.add_argument("--warp",
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
         parser.add_argument("-r", action='store_true', dest="r_trim",
-            help="Crop using recursive trimming")
-        Filter.arguments(cls, parser)
-        parser.set_defaults(plugin=cls)
+            help="Crop using recursive trimming (otherwise search for corners; not implemented yet)")
+        Filter.arguments(parser)
+        parser.set_defaults(plugin=cls, r_trim=True, warp=16)
     
-    def __call__(self):
+    def run_one(self):
         ''' Automatically search for the most contrasting rectangle in the image
     
             It trims edges of the image iteratively, maximizing crop metric:
                 abs( average of border - average of crop)
         '''
-        self.image = Image.load(self.args.input)
-        a = self._recursive_rectangle_crop(step=self.image.array, parent_crop_score=-1)
-        Image(a[0]).save(self.args.output)
+        self.image = self.meta.load()
+        if self.args.r_trim:
+            image = self._recursive_rectangle_crop(step=self.image, parent_crop_score=-1)
+            self.meta.save(image[0])
+        else:
+            pass
+
     
+
     def _get_crop_score(self, step):
         if step.size == 0:
             # This is undefined
             return -1
-        if self.image.array.size - step.size == 0:
+        if self.image.size - step.size == 0:
             # This is also undefined
             return -1
-        all_sum = self.image.sum # Image() not ndarray() : sum, not sum()
+        all_sum = self.meta.sum # Image() not ndarray() : sum, not sum()
         crop_sum = step.sum()
         border_sum = all_sum - crop_sum
         
@@ -58,7 +63,6 @@ class Crop(Filter):
             (slice(0, -1), _all),
             (slice(1, None), _all)]
         crop_score = self._get_crop_score(step)
-        print step.shape, crop_score
         if crop_score < parent_crop_score:
             # Prune this branch of computation
             return (step, crop_score)
