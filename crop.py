@@ -3,17 +3,16 @@ import cv2
 import collections
 import math
 
-class Crop(Command):
+class Crop(Filter):
     __description__ = "Automatically crop a scan to the image it contains"
     @classmethod
     def arguments(cls, parser):
         parser.add_argument("--warp", default=16,
             help="How many lines to skip when a large crop seems likely. "
-                "Lower numbers are more accurate, higher is faster.")
+                "Lower numbers are more accurate, higher is faster (for use with -r)")
         parser.add_argument("-r", action='store_true', dest="r_trim",
             help="Crop using recursive trimming")
-        parser.add_argument("input", help='input filename')
-        parser.add_argument("output", help='output filename')
+        Filter.arguments(cls, parser)
         parser.set_defaults(plugin=cls)
     
     def __call__(self):

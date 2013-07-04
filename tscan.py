@@ -16,4 +16,4 @@ for name in plugin_names:
 
 args = ap.parse_args()
 # Instantiate and call the plugin
-args.plugin(args)()
+args.plugin(args).start()
