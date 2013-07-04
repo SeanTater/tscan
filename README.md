@@ -7,4 +7,5 @@ Requirements
 ------------
  - opencv2
   - On ubuntu:
+
     sudo apt-get install python-opencv
