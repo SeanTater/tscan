@@ -1,3 +1,4 @@
+import cv2
 class Image(object):
     def __init__(self, array, filename=None):
         self.array = array
@@ -15,9 +16,6 @@ class Image(object):
             raise ValueError, "Save has no filename"
         return cv2.imwrite(filename or self.filename, self.array)
         
-class Plugin(object):
-    def __init__(self, image, output, opts, args):
-        self.image = image
-        self.output = output
-        self.opts = opts
+class Command(object):
+    def __init__(self, args):
         self.args = args

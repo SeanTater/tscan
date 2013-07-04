@@ -14,8 +14,6 @@ for name in plugin_names:
     plugin.arguments(plugin_parser)
     plugins[name] = plugin
 
-
-ap.add_argument("input", nargs='+', help="Input image filename")
-opts, args = ap.parse_args()
-
-
+args = ap.parse_args()
+# Instantiate and call the plugin
+args.plugin(args)()
