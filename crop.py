@@ -11,9 +11,9 @@ class Crop(Filter):
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
         parser.add_argument("-r", action='store_true', dest="r_trim",
-            help="Crop using recursive trimming (otherwise search for corners; not implemented yet)")
+            help="Crop using recursive trimming (otherwise search for corners)")
         Filter.arguments(parser)
-        parser.set_defaults(plugin=cls, r_trim=True, warp=16)
+        parser.set_defaults(plugin=cls, r_trim=False, warp=16)
     
     def run_one(self):
         ''' Automatically search for the most contrasting rectangle in the image
@@ -26,9 +26,34 @@ class Crop(Filter):
             image = self._recursive_rectangle_crop(step=self.image, parent_crop_score=-1)
             self.meta.save(image[0])
         else:
-            pass
+            self.get_tlc()
+            image = self.get_max()
+            self.meta.save(image)
 
+    def get_tlc(self):
+        se = numpy.array([
+            [-1.0, -1.0],
+            [-1.0,  3.0]])
+        mini = cv2.resize(self.image, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
+        self.corners = cv2.filter2D(self.mini, -1, se)
     
+    def get_max(self):
+        up = numpy.array([
+            [-1.0],
+            [ 1.0],
+            [ 0.0]])
+        down = numpy.array([
+            [ 0.0],
+            [ 1.0],
+            [-1.0]])
+        left = numpy.array([-1.0, 1.0,  0.0])
+        right = numpy.array([0.0, 1.0, -1.0])
+        
+        upf = cv2.filter2D(self.corners, -1, up)
+        downf = cv2.filter2D(self.corners, -1, down)
+        leftf = cv2.filter2D(self.corners, -1, left)
+        rightf = cv2.filter2D(self.corners, -1, right)
+        return ((upf > 0) & (downf > 0)) & ((leftf > 0) & (rightf > 0))
 
     def _get_crop_score(self, step):
         if step.size == 0:
