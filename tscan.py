@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import argparse
 import importlib
-plugin_names = ['Crop']
+plugin_names = ['Crop', 'CropCorners']
 plugins = {}
 
 ap = argparse.ArgumentParser("tscan")
