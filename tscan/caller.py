@@ -2,7 +2,7 @@ import argparse
 import importlib
 
 def call():
-    module_names = ['crop']
+    module_names = ['crop', 'crop_gradient']
 
     ap = argparse.ArgumentParser()
     subparsers = ap.add_subparsers(help="Plugins")
