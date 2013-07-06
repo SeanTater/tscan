@@ -11,7 +11,7 @@ class Crop(Filter):
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
         Filter.arguments(parser)
-        parser.set_defaults(plugin=cls, r_trim=False, warp=16)
+        parser.set_defaults(r_trim=False, warp=16)
     
     def run_one(self):
         ''' Automatically search for the most contrasting rectangle in the image

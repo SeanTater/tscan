@@ -52,7 +52,6 @@ class Filter(Command):
                 self.run_one()
             finally:
                 self.queue.task_done()
-                print self.queue.qsize()
 
     @classmethod
     def supervise(cls, args):

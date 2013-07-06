@@ -3,16 +3,18 @@ import cv2
 import numpy
 class CropCorners(Filter):
     __description__ = "Crops out an image by searching for the corners of the print"
-    def run_one(self):
+
+    def run_one(self):        
+        self.image = self.meta.load()
         self.get_tlc()
-        image = self.get_max()
-        self.meta.save(image)
+        self.get_max()
+        self.meta.save(self.image)
     
     def get_tlc(self):
         se = numpy.array([
             [-1.0, -1.0],
             [-1.0,  3.0]])
-        mini = cv2.resize(self.image, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
+        self.mini = cv2.resize(self.image, None, fx=0.25, fy=0.25, interpolation=cv2.INTER_AREA)
         self.corners = cv2.filter2D(self.mini, -1, se)
     
     def get_max(self):
@@ -31,4 +33,4 @@ class CropCorners(Filter):
         downf = cv2.filter2D(self.corners, -1, down)
         leftf = cv2.filter2D(self.corners, -1, left)
         rightf = cv2.filter2D(self.corners, -1, right)
-        return ((upf > 0) & (downf > 0)) & ((leftf > 0) & (rightf > 0))
+        self.image = ((upf > 0) & (downf > 0)) & ((leftf > 0) & (rightf > 0))
