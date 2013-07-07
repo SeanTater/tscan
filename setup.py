@@ -13,5 +13,5 @@ setup(name='tscan',
   license='GPLv3',
   packages=find_packages(),
   url='https://github.com/SeanTater/tscan',
-  version='0.1a',
+  version='0.1a2',
  )
