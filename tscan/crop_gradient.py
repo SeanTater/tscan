@@ -9,7 +9,11 @@ class CropGradient(Filter):
             needs the image to be very close to level
     '''
 
-    def run_one(self):        
+    def run_one(self):
+        self.estimate()
+        self.apply_crop()
+    
+    def estimate(self):
         image = self.meta.load()
         signed_gray = image.sum(axis=2)
         
@@ -29,10 +33,11 @@ class CropGradient(Filter):
             # Add one because each deriv is off by 1/2                          
             start_ii = numpy.argmax(deriv_1[deriv_2_at_0_i]) + 1
             stop_ii = numpy.argmin(deriv_1[deriv_2_at_0_i]) + 1
-            start_i[axis] = deriv_2_at_0_i[start_ii]
-            stop_i[axis] = deriv_2_at_0_i[stop_ii]
-            if start_i[axis] > stop_i[axis]:
-                start_i[axis], stop_i[axis] = stop_i[axis], start_i[axis]  
-        
-        cropped_image = image[start_i[0]:stop_i[0], start_i[1]:stop_i[1]]
+            self.start_i[axis] = deriv_2_at_0_i[start_ii]
+            self.stop_i[axis] = deriv_2_at_0_i[stop_ii]
+            if self.start_i[axis] > self.stop_i[axis]:
+                self.start_i[axis], self.stop_i[axis] = self.stop_i[axis], self.start_i[axis]  
+
+    def apply_crop(self):
+        cropped_image = image[self.start_i[0]:self.stop_i[0], self.start_i[1]:self.stop_i[1]]
         self.meta.save(cropped_image)
