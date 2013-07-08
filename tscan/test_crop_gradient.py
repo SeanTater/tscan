@@ -14,5 +14,7 @@ class CropGradientTest(unittest.TestCase):
         self.crop_gradient.run_one()
         self.assertTrue(self.crop_gradient.meta.load.called)
         self.assertTrue(self.crop_gradient.meta.save.called)
-        result = self.crop_gradient.meta.save.call_args[0][0]
+
+    def test_against_reference(self):
+        pass
         

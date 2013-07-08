@@ -6,12 +6,13 @@ setup(name='tscan',
   author='Sean Gallagher',
   author_email='stgallag@gmail.com',
   description='Command line image scanning swiss army knife',
+  dependency_links = ["https://googledrive.com/host/0B8wOEC5-v5lXRVJ5Skl2d0VsTjQ/"],
   entry_points = {
     'console_scripts' : [ 'tscan = tscan.caller:call' ]
   },
-  install_requires = ['numpy'],#['cv2'],
+  install_requires = ['numpy'], # OpenCV isn't on PyPI
   license='GPLv3',
-  packages=find_packages(),
+  packages=['tscan'],
   url='https://github.com/SeanTater/tscan',
   version='0.1a2',
  )

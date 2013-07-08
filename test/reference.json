@@ -1,37 +1,37 @@
 {
-    '_comment': "Coordinates are in x,y order",
-    'DSCF6076.JPG': {
+    _comment: "Coordinates are in x,y order",
+    "DSCF6076.JPG": {
         top_left: [898, 144],
         top_right: [2128, 137],
         bottom_left: [900, 1968],
         bottom_right: [2171, 1958]
     },
-    'DSCF6078.JPG': {
+    "DSCF6078.JPG": {
         top_left: [895, 769],
         top_right: [2719, 815],
         bottom_left: [850, 2007],
         bottom_right: [2718, 2060]
     },
-    'DSCF6079.JPG': {
+    "DSCF6079.JPG": {
         top_left: [1096, 850],
         top_right: [3668, 893],
         bottom_left: [1054, 2596],
         bottom_right: [3689, 2639]
     },
-    'DSCF6080.JPG': {
+    "DSCF6080.JPG": {
         top_left: [897, 304],
         top_right: [2128, 300],
         bottom_left: [894, 2129],
         bottom_right: [2167, 2115]
     },
-    'DSCF6083.JPG': {
+    "DSCF6083.JPG": {
         top_left: [1115, 653],
         top_right: [2963, 652],
         bottom_left: [1114, 1904],
         bottom_right: [3005, 1905]
     },
-    'DSCF6090.JPG': {
-        tags = ['crooked'],
+    "DSCF6090.JPG": {
+        tags = ["crooked"],
         top_left: [831, 719],
         top_right: [4249, 517],
         bottom_left: [953, 3059],
