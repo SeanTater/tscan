@@ -4,14 +4,22 @@ import collections
 import math
 
 class Crop(Filter):
-    __description__ = "Automatically crop a scan to the image it contains"
+    ''' Automatically crop a scan to the image it contains
+        
+        Works by repeated trimming, looking for the greatest contrast between
+        the crop and the border. This automatic cropping method:
+            is slow
+            handles non-rectangular images
+            doesn't require the image to be level, but
+            doesn't make any effort to straighten unlevel images
+    '''
     @classmethod
     def arguments(cls, parser):
         parser.add_argument("--warp",
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
         Filter.arguments(parser)
-        parser.set_defaults(r_trim=False, warp=16)
+        parser.set_defaults(warp=16)
     
     def run_one(self):
         ''' Automatically search for the most contrasting rectangle in the image

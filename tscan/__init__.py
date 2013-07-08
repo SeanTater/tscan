@@ -1,1 +1,1 @@
-__all__ = ['common', 'crop', 'cropcorners']
+__all__ = ['common', 'crop', 'crop_gradient']

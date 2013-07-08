@@ -12,8 +12,10 @@ def call():
         
         module = importlib.import_module('tscan.%s' %module_name)
         plugin = getattr(module, plugin_name)
-        
-        plugin_parser = subparsers.add_parser(module_name, help=plugin.__description__)
+        plugin_description, plugin_doc = [t.strip() for t in plugin.__doc__.split('\n', 1)]
+        plugin_parser = subparsers.add_parser(module_name,
+            help=plugin_description,
+            epilog=plugin_doc)
         plugin_parser.set_defaults(plugin=plugin)
         plugin.arguments(plugin_parser)
 

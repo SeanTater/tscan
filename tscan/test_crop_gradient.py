@@ -7,10 +7,12 @@ from crop_gradient import CropGradient
 class CropGradientTest(unittest.TestCase):
     def setUp(self):
         self.crop_gradient = CropGradient(None, None)
-        self.crop_gradient.meta = meta = Mock()
-        meta.load.return_value = cv2.imread("test/DSCF6076.JPG")
-        #numpy.ones((4,4,3), dtype=numpy.uint8)
+        self.crop_gradient.meta = Mock()
 
-    def test_run_one(self):
+    def test_run_one(self):        
+        self.crop_gradient.meta.load.return_value = cv2.imread("test/sample01.JPG")
         self.crop_gradient.run_one()
         self.assertTrue(self.crop_gradient.meta.load.called)
+        self.assertTrue(self.crop_gradient.meta.save.called)
+        result = self.crop_gradient.meta.save.call_args[0][0]
+        
