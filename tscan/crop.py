@@ -4,8 +4,30 @@ import collections
 import math
 
 # Oh Snap! Y then X?! Yes, that's life!
-Point = collections.namedtuple("Point", ["y", "x"])
-Region = collections.namedtuple("Region", ["start", "stop"])
+class Point(object):
+    def __init__(self, y, x):
+        self.y, self.x = y, x
+    
+    def __getitem__(self, i):
+        return (self.y, self.x)[i]
+    
+    def almost(self, pt, precision=10):
+        ''' Are these points almost equal? '''
+        return max(abs(self.y - pt.y), abs(self.x - pt.x)) < precision
+        
+
+class Region(tuple):
+    def __init__(self, start, stop):
+        self.start, self.stop = start, stop
+        if issubclass(self.start, dict):
+            self.start = Point(**self.start)
+        if issubclass(self.stop, dict):
+            self.stop = Point(**self.stop)
+    
+    def almost(self, region, precision=10):
+        ''' Are these regions almost equal? '''
+        return (self.start.almost(region.start, precision)
+            and self.stop.almost(region.stop, precision))
 
 class Crop(Filter):
     ''' Automatically crop a scan to the image it contains
