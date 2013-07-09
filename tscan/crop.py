@@ -3,6 +3,10 @@ import cv2
 import collections
 import math
 
+# Oh Snap! Y then X?! Yes, that's life!
+Point = collections.namedtuple("Point", ["y", "x"])
+Region = collections.namedtuple("Region", ["start", "stop"])
+
 class Crop(Filter):
     ''' Automatically crop a scan to the image it contains
         

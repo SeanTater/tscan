@@ -1,4 +1,5 @@
 from common import Filter
+from crop import Region, Point
 import numpy
 class CropGradient(Filter):
     ''' Crops out an image using lines of strongest gradient
@@ -17,8 +18,7 @@ class CropGradient(Filter):
         image = self.meta.load()
         signed_gray = image.sum(axis=2)
         
-        threshold = 25
-        start_i, stop_i = [0, 0], [0, 0]
+        region = Region(Point(0, 0), Point(0, 0))
         for axis in [0, 1]:
             signed_axis = signed_gray.sum(axis=axis)
             # Get derivatives
@@ -33,11 +33,13 @@ class CropGradient(Filter):
             # Add one because each deriv is off by 1/2                          
             start_ii = numpy.argmax(deriv_1[deriv_2_at_0_i]) + 1
             stop_ii = numpy.argmin(deriv_1[deriv_2_at_0_i]) + 1
-            self.start_i[axis] = deriv_2_at_0_i[start_ii]
-            self.stop_i[axis] = deriv_2_at_0_i[stop_ii]
-            if self.start_i[axis] > self.stop_i[axis]:
-                self.start_i[axis], self.stop_i[axis] = self.stop_i[axis], self.start_i[axis]  
+            
+            region.start[axis] = deriv_2_at_0_i[start_ii]
+            region.stop[axis] = deriv_2_at_0_i[stop_ii]
+            if region.start[axis] > region.stop[axis]:
+                region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
+	return region
 
-    def apply_crop(self):
-        cropped_image = image[self.start_i[0]:self.stop_i[0], self.start_i[1]:self.stop_i[1]]
+    def apply_crop(self, region):
+        cropped_image = image[region.start.y:region.stop.y, region.start.x:region.stop.x]
         self.meta.save(cropped_image)

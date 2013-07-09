@@ -21,7 +21,7 @@ class CropGradientTest(unittest.TestCase):
     def test_against_reference(self):
         for image_name in tscantest.images:
             image_meta = ImageMeta(image_name['filename'])
-            cg = CropGradient(image_meta).estimate()
+            region = CropGradient(image_meta).estimate()
             # Compare the crop corners - not done!
        
         
