@@ -10,7 +10,7 @@ class CropGradientTest(unittest.TestCase):
     def setUp(self):
         self.crop_gradient = CropGradient(None, None)
         self.crop_gradient.meta = Mock()
-        self.sample_image_filename = tscantest.images.values()[0]
+        self.sample_image_filename = tscantest.images.values()[0]['filename']
 
     def test_run_one(self):        
         self.crop_gradient.meta.load.return_value = cv2.imread(self.sample_image_filename)
@@ -20,7 +20,8 @@ class CropGradientTest(unittest.TestCase):
 
     def test_against_reference(self):
         for image_name in tscantest.images:
-            image_meta = ImageMeta(image_name['filename'])
+            image_info = tscantest.images[image_name]
+            image_meta = ImageMeta(image_info['filename'])
             region = CropGradient(image_meta).estimate()
             reference_region = Region(**tscantest.images[image_name]['region'])
             # Compare the crop corners - not done!

@@ -1,6 +1,5 @@
 from common import Filter, ImageMeta
 import cv2
-import collections
 import math
 
 # Oh Snap! Y then X?! Yes, that's life!
@@ -16,7 +15,7 @@ class Point(object):
         return max(abs(self.y - pt.y), abs(self.x - pt.x)) < precision
         
 
-class Region(tuple):
+class Region(object):
     def __init__(self, start, stop):
         self.start, self.stop = start, stop
         if issubclass(self.start, dict):

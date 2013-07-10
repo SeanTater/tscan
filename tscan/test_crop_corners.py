@@ -1,7 +1,7 @@
 import unittest
 import numpy
 from mock import Mock
-from cropcorners import CropCorners
+from crop_corners import CropCorners
 
 class CropCornersTest(unittest.TestCase):
     def setUp(self):
