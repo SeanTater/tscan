@@ -27,7 +27,7 @@ class Region(object):
         ''' Are these regions almost equal? '''
         return (self.start.almost(region.start, precision)
             and self.stop.almost(region.stop, precision))
-
+        
 class Crop(Filter):
     ''' Automatically crop a scan to the image it contains
         
