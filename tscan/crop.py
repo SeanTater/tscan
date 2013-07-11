@@ -1,4 +1,5 @@
 from common import ImageMeta, Sprocket
+import cli
 import cv2
 import math
 
@@ -38,12 +39,10 @@ class Crop(Sprocket):
             doesn't require the image to be level, but
             doesn't make any effort to straighten unlevel images
     '''
-    @classmethod
-    def arguments(cls, parser):
-        parser.add_argument("--warp",
+    cli.parser.add_argument("--warp",
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
-        parser.set_defaults(warp=16)
+    cli.parser.set_defaults(warp=16)
     
     def run(self):
         ''' Automatically search for the most contrasting rectangle in the image
