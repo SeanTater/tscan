@@ -12,7 +12,7 @@ setup(name='tscan',
   },
   install_requires = ['numpy'], # OpenCV isn't on PyPI
   license='GPLv3',
-  packages=['tscan'],
+  packages=['futures', 'tscan'],
   url='https://github.com/SeanTater/tscan',
   version='0.1a2',
  )
