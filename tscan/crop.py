@@ -1,4 +1,4 @@
-from common import Filter, ImageMeta
+from common import ImageMeta, Sprocket
 import cv2
 import math
 
@@ -28,7 +28,7 @@ class Region(object):
         return (self.start.almost(region.start, precision)
             and self.stop.almost(region.stop, precision))
         
-class Crop(Filter):
+class Crop(Sprocket):
     ''' Automatically crop a scan to the image it contains
         
         Works by repeated trimming, looking for the greatest contrast between
@@ -43,19 +43,21 @@ class Crop(Filter):
         parser.add_argument("--warp",
             help="How many lines to skip when a large crop seems likely. "
                 "Lower numbers are more accurate, higher is faster (for use with -r)")
-        Filter.arguments(parser)
         parser.set_defaults(warp=16)
     
-    def run_one(self):
+    def run(self):
         ''' Automatically search for the most contrasting rectangle in the image
     
             It trims edges of the image iteratively, maximizing crop metric:
                 abs(log( average of border / average of crop))
         '''
-        self.image = self.meta.load()
+        self.meta = meta
+        self.image = self.meta.data
         image = self.recursive_rectangle_crop(step=self.image, parent_crop_score=-1)
-        self.meta.save(image[0])
+        self.meta.data = image[0]
+        return self.meta
 
+    def get_crop_score(self):
         if step.size == 0:
             # This is undefined
             return -1

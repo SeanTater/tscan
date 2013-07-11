@@ -58,32 +58,12 @@ class Pipe(object):
     
     def worker(self):
         try:
-            meta = self.pending.get()
-            out = self.main(meta, self.args).run()
+            item = self.pending.get()
+            out = self.main(self.args).run(item)
             self.sink.put(out)
         finally:
             self.pending.task_done()
-            
-class Filter(object):
-    @classmethod
-    def arguments(cls, parser):
-        parser.add_argument("input", nargs='+', help='input filename[s]')
-        parser.add_argument("output", nargs='?', default=None, help='output filename or pattern (if more than one input)')
-        
-    def __init__(self, meta, args):
-        self.meta = meta
-        self.image = self.meta.load()
-        self.args = args
-                
-    def run(self):
-        cpus = multiprocessing.cpu_count()
-        q = queue.Queue(2*cpus)
-        # Load workers, adding 1 for IO waiting
-        for i in range(cpus+1):
-            worker = cls(args, q)
-            worker.daemon=True
-            worker.start()
 
-        for filename in args.input:
-            q.put(ImageMeta(filename, output=args.output))
-        q.join()
+class Sprocket(object):
+    def __init__(self, args):
+        self.args = args

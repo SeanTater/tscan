@@ -1,7 +1,7 @@
-from common import Filter
 from crop import Region, Point
+from common import Sprocket
 import numpy
-class CropGradient(Filter):
+class CropGradient(Sprocket):
     ''' Crops out an image using lines of strongest gradient
         
         This method of cropping:
@@ -10,12 +10,14 @@ class CropGradient(Filter):
             needs the image to be very close to level
     '''
 
-    def run_one(self):
+    def run(self, meta):
+        self.meta = meta
         self.estimate()
-        self.apply_crop()
+        self.meta.data = self.meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
+        return self.meta
     
     def estimate(self):
-        image = self.meta.load()
+        image = self.meta.data
         signed_gray = image.sum(axis=2)
         
         region = Region(Point(0, 0), Point(0, 0))
@@ -39,7 +41,3 @@ class CropGradient(Filter):
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
 	return region
-
-    def apply_crop(self, region):
-        cropped_image = image[region.start.y:region.stop.y, region.start.x:region.stop.x]
-        self.meta.save(cropped_image)
