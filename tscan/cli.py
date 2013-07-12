@@ -5,7 +5,7 @@ plugins = []
 
 enabled = False
 
-def transform_to_argparse(argument):
+def transform_to_argparse(argument, as_flag):
     ''' Remove ['name'] from argument but leave the original intact.
         The original arguments are  conveniently defined to be the same as argparse,
         but with the positional argument(s) to add_argument as 'name' in the dict. Undo that.'''
@@ -13,7 +13,8 @@ def transform_to_argparse(argument):
     names = arg_sans_name.pop('name')
     if not isinstance(names, (tuple, list)):
         names = [names]
-    names = [n.strip('-') for n in names]
+    if not as_flag:
+        names = [n.strip('-') for n in names]
     return names, arg_sans_name
 
 def register(plugin):
@@ -26,7 +27,7 @@ def register(plugin):
     def init_from_cli(cli_args):
         kw = {}
         for arg in plugin._args:
-            names, extra = transform_to_argparse(argument)
+            names, extra = transform_to_argparse(argument, as_flag=False)
             name = names[-1]
             if name in cli_args:
                 kw[name] = cli_args[name]

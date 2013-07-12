@@ -6,10 +6,10 @@ import cli
 class CropGradient(object):
     ''' Crops out an image using lines of strongest gradient
         
-        This method of cropping:
-            is very fast
-            works only for rectangular images (cuts others incorrectly)
-            needs the image to be very close to level
+        This method of cropping
+            is fast,
+            works only for rectangular images (cuts others incorrectly),
+            and needs the image to be very close to level.
     '''
     _name = 'crop_gradient'
     _args = []

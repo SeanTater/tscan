@@ -24,7 +24,7 @@ def call():
             plugin_parser.set_defaults(plugin=plugin)
         
         for arg in plugin._args:
-            names, extra = cli.transform_to_argparse(arg)
+            names, extra = cli.transform_to_argparse(arg, as_flag=True)
             plugin_parser.add_argument(*names, **extra)
         
 
