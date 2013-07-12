@@ -11,12 +11,15 @@ class CropGradientTest(unittest.TestCase):
     def setUp(self):
         self.crop_gradient = CropGradient()
 
-    def test_run_one(self):        
-        self.crop_gradient.run(tscantest.metas[0])
+    def test_one(self): 
+        meta = tscantest.metas[0]
+        self.crop_gradient.run(meta)
+        
+        # Bug: returned bool output, should still be uint8
+        self.assertEqual(meta.data.dtype, numpy.uint8) 
 
     def test_against_reference(self):
         for meta in tscantest.metas:
             region = CropGradient().estimate(meta)
-            # Compare the crop corners - not done!
             self.assertTrue(region.almost(meta.reference_crop))
         

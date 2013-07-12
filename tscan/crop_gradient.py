@@ -14,7 +14,7 @@ class CropGradient(object):
     _name = 'crop_gradient'
     _args = []
     def run(self, meta):
-        self.estimate(meta)
+        region = self.estimate(meta)
         meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
         return meta
     
