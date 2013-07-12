@@ -32,3 +32,5 @@ def register(plugin):
             if name in cli_args:
                 kw[name] = cli_args[name]
         return plugin(**kw)
+    
+    return init_from_cli

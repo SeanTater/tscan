@@ -1,9 +1,9 @@
 import importlib
 import cli
-cli.enabled = True
 from common import *
 
 def call():
+    cli.enabled = True
     # How to do this automatically?
     module_names = ['crop', 'crop_gradient']
 

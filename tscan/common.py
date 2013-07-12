@@ -7,7 +7,17 @@ import cli
 class ImageMeta(object):
     def __init__(self, filename):
         self.filename = filename
-        self.data = None
+        self._data = None
+    
+    @property
+    def data(self):
+        if self._data is None:
+            self._data = cv2.imread(self.filename)
+        return self._data
+    
+    @data.setter
+    def data(self, data):
+        self._data = data
 
 @cli.register
 class NameListSource(object):
@@ -23,8 +33,6 @@ class NameListSource(object):
     def run(self):
         for filename in self.names:
             meta = ImageMeta(filename)
-            # TODO: Might be a bottleneck
-            meta.data = imread(filename)
             sink.put(meta)
             
 @cli.register

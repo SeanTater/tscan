@@ -9,7 +9,15 @@ class Point(object):
         self.y, self.x = y, x
     
     def __getitem__(self, i):
+        ''' Treat point as a tuple '''
         return (self.y, self.x)[i]
+    
+    def __setitem__(self, i, v):
+        ''' Unlike tuple, point is mutable '''
+        if i:
+            self.x = v
+        else:
+            self.y = v
     
     def almost(self, pt, precision=10):
         ''' Are these points almost equal? '''
@@ -19,9 +27,9 @@ class Point(object):
 class Region(object):
     def __init__(self, start, stop):
         self.start, self.stop = start, stop
-        if issubclass(self.start, dict):
+        if isinstance(self.start, dict):
             self.start = Point(**self.start)
-        if issubclass(self.stop, dict):
+        if isinstance(self.stop, dict):
             self.stop = Point(**self.stop)
     
     def almost(self, region, precision=10):

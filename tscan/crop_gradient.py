@@ -14,14 +14,12 @@ class CropGradient(object):
     _name = 'crop_gradient'
     _args = []
     def run(self, meta):
-        self.meta = meta
-        self.estimate()
-        self.meta.data = self.meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
-        return self.meta
+        self.estimate(meta)
+        meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
+        return meta
     
-    def estimate(self):
-        image = self.meta.data
-        signed_gray = image.sum(axis=2)
+    def estimate(self, meta):
+        signed_gray = meta.data.sum(axis=2)
         
         region = Region(Point(0, 0), Point(0, 0))
         for axis in [0, 1]:
