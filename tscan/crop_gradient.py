@@ -1,7 +1,9 @@
 from crop import Region, Point
-from common import Sprocket
 import numpy
-class CropGradient(Sprocket):
+import cli
+
+@cli.register
+class CropGradient(object):
     ''' Crops out an image using lines of strongest gradient
         
         This method of cropping:
@@ -9,7 +11,8 @@ class CropGradient(Sprocket):
             works only for rectangular images (cuts others incorrectly)
             needs the image to be very close to level
     '''
-
+    _name = 'crop_gradient'
+    _args = []
     def run(self, meta):
         self.meta = meta
         self.estimate()
@@ -40,4 +43,4 @@ class CropGradient(Sprocket):
             region.stop[axis] = deriv_2_at_0_i[stop_ii]
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
-	return region
+        return region

@@ -1,33 +1,40 @@
 import importlib
 import cli
-
+cli.enabled = True
 from common import *
 
 def call():
     # How to do this automatically?
     module_names = ['crop', 'crop_gradient']
 
+    # It would be great if we didn't have to load all of these every time
     for module_name in module_names:
-        plugin_name = module_name.title().replace("_", "")
-        
         module = importlib.import_module('tscan.%s' %module_name)
-        plugin = getattr(module, plugin_name)
-        plugin_description, plugin_doc = [t.strip() for t in plugin.__doc__.split('\n', 1)]
-        plugin_parser = cli.subparsers.add_parser(module_name,
-            help=plugin_description,
-            epilog=plugin_doc)
-        plugin_parser.set_defaults(plugin=plugin)
-
-    args = cli.parser.parse_args()
-    # Instantiate and call the plugin
-    args.plugin.supervise(args)
-
-    # Backward
-    p_out = FileSink(args.output)
-    p_middle = Pipe(plugin, p_out)
-    p_in = NameListSource(args.input)
     
-    # Forward
-    p_in.run()
-    p_middle.run()
-    p_out.run()
+    for plugin in cli.plugins:
+        plugin_description, plugin_doc = [t.strip() for t in plugin.__doc__.split('\n', 1)]
+        
+        # Certain builtin plugins have no commands
+        if hasattr(plugin, '_builtin'):
+            plugin_parser = cli.parser
+        else:
+            plugin_parser = cli.subparsers.add_parser(plugin._name,
+                help=plugin_description,
+                epilog=plugin_doc)
+            plugin_parser.set_defaults(plugin=plugin)
+        
+        for arg in plugin._args:
+            names, extra = cli.transform_to_argparse(arg)
+            plugin_parser.add_argument(*names, **extra)
+        
+
+    cli_args = cli.parser.parse_args()
+
+    # These all take "args" because of cli.register
+    p_in = NameListSource(cli_args)
+    p_middle = plugin(cli_args)
+    p_out = FileSink(cli_args)
+    
+    Pipe(p_in, p_middle, p_out).run()
+    
+    

@@ -1,7 +1,8 @@
-from common import ImageMeta, Sprocket
+from common import ImageMeta
 import cli
 import cv2
 import math
+
 
 # Oh Snap! Y then X?! Yes, that's life!
 class Point(object):
@@ -28,9 +29,10 @@ class Region(object):
         ''' Are these regions almost equal? '''
         return (self.start.almost(region.start, precision)
             and self.stop.almost(region.stop, precision))
-        
-class Crop(Sprocket):
-    ''' Automatically crop a scan to the image it contains
+       
+@cli.register
+class Crop(object):
+    ''' Crop an image by searching for the region of highest contrast
         
         Works by repeated trimming, looking for the greatest contrast between
         the crop and the border. This automatic cropping method:
@@ -39,10 +41,10 @@ class Crop(Sprocket):
             doesn't require the image to be level, but
             doesn't make any effort to straighten unlevel images
     '''
-    cli.parser.add_argument("--warp",
-            help="How many lines to skip when a large crop seems likely. "
-                "Lower numbers are more accurate, higher is faster (for use with -r)")
-    cli.parser.set_defaults(warp=16)
+    _name = 'crop_contrast'
+    _args = [ dict(name='--warp', default=16,
+        help="How many lines to skip when a large crop seems likely. "
+            "Lower numbers are more accurate, higher is faster (for use with -r)") ]
     
     def run(self):
         ''' Automatically search for the most contrasting rectangle in the image
