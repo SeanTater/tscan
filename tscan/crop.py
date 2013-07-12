@@ -25,12 +25,15 @@ class Point(object):
         
 
 class Region(object):
+    ''' A rectangle made from two Point()'s
+        Naturally, they need to be opposite corners, and the convention is for
+        start to be top-left and end bottom-right.'''
     def __init__(self, start, stop):
         self.start, self.stop = start, stop
-        if isinstance(self.start, dict):
-            self.start = Point(**self.start)
-        if isinstance(self.stop, dict):
-            self.stop = Point(**self.stop)
+    
+    def __repr__(self):
+        return "<Region ({start.y}, {start.x})->({stop.y}, {stop.x})>".format(
+            start=self.start, stop=self.stop)
     
     def almost(self, region, precision=10):
         ''' Are these regions almost equal? '''

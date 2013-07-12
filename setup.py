@@ -10,9 +10,9 @@ setup(name='tscan',
   entry_points = {
     'console_scripts' : [ 'tscan = tscan.caller:call' ]
   },
-  install_requires = ['numpy'], # OpenCV isn't on PyPI
+  install_requires = ['numpy', 'futures', 'jsonpickle'], # OpenCV isn't on PyPI
   license='GPLv3',
-  packages=['futures', 'tscan'],
+  packages=['tscan'],
   url='https://github.com/SeanTater/tscan',
   version='0.1a2',
  )
