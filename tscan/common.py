@@ -64,8 +64,7 @@ class FileSink(object):
 class Pipe(object):
     # Adding 1 for IO waiting
     max_workers = multiprocessing.cpu_count() + 1
-    def __init__(self, args, source, *parts):
-        self.args = args
+    def __init__(self, source, *parts):
         self.source = source
         self.parts = parts
     
@@ -74,7 +73,7 @@ class Pipe(object):
         with futures.ThreadPoolExecutor(max_workers=self.max_workers) as e:
             for item in self.source.run():
                 e.submit(self.worker, item)
-    
+               
     def worker(self, item):
         for part in self.parts:
             item = part.run(item)

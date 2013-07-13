@@ -1,6 +1,6 @@
 import unittest
 import mock
-from common import ImageMeta, NameListSource, FileSink
+from common import ImageMeta, NameListSource, FileSink, Pipe
 
 class TestImageMeta(unittest.TestCase):
     def test_create(self):
@@ -56,3 +56,20 @@ class TestFileSink(unittest.TestCase):
                 mock.call('foo', None),
                 mock.call('/path/to/foo.jpg', None),
                 mock.call('/path/to/foo_out.jpg', None)]
+
+class TestPipe(unittest.TestCase):
+    def test_create(self):
+        p = Pipe('one', 'two', 'three')
+        assert p.source == 'one'
+        assert p.parts == ('two', 'three')
+    
+    def test_run(self):
+        source = mock.Mock()
+        source.run.return_value = 'foo'
+        part = mock.Mock()
+        part.run.return_value = 'bar'
+        p = Pipe(source, part)
+        p.run()
+        assert source.run.mock_calls == [mock.call()]
+        assert part.run.mock_calls == [mock.call('foo')]
+        
