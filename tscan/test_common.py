@@ -65,7 +65,7 @@ class TestPipe(unittest.TestCase):
     
     def test_run(self):
         source = mock.Mock()
-        source.run.return_value = 'foo'
+        source.run.return_value = iter(['foo'])
         part = mock.Mock()
         part.run.return_value = 'bar'
         p = Pipe(source, part)
