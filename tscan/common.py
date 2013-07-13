@@ -54,12 +54,12 @@ class FileSink(object):
         # Only act when others request it
         pass
     
-    def put(self, image):
+    def put(self, meta):
         ''' Takes image (ImageMeta) and writes it to a file '''
-        includes = {"path": item.filename}
-        includes["path_noext"], includes["ext"] = os.path.splitext(item.filename)
+        includes = {"path": meta.filename}
+        includes["path_noext"], includes["ext"] = os.path.splitext(meta.filename)
         output = self.output_pattern % includes
-        return cv2.imwrite(output, image.data)
+        return cv2.imwrite(output, meta.data)
 
 class Pipe(object):
     # Adding 1 for IO waiting
