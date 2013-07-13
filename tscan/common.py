@@ -19,7 +19,7 @@ class ImageMeta(object):
     def data(self, data):
         self._data = data
 
-@cli.register
+@cli.default.register
 class NameListSource(object):
     ''' Creates new ImageMetas from a list of filenames
     
@@ -34,7 +34,7 @@ class NameListSource(object):
         for filename in self.filenames:
             yield ImageMeta(filename)
             
-@cli.register
+@cli.default.register
 class FileSink(object):
     ''' Takes ImageMetas and saves them to new files
         

@@ -1,7 +1,7 @@
 import cli
 from crop import Region, Point
 
-@cli.register
+@cli.default.register
 class CropContrast(object):
     ''' Crop an image by searching for the region of highest contrast
         

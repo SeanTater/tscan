@@ -3,7 +3,7 @@ import numpy
 import cli
 import code
 
-@cli.register
+@cli.default.register
 class CropGradient(object):
     ''' Crops out an image using lines of strongest gradient
         
