@@ -28,12 +28,11 @@ class NameListSource(object):
     _builtin = True
     
     def __init__(self, filenames):
-        self.names = names
+        self.filenames = filenames
     
     def run(self):
-        for filename in self.names:
-            meta = ImageMeta(filename)
-            sink.put(meta)
+        for filename in self.filenames:
+            yield ImageMeta(filename)
             
 @cli.register
 class FileSink(object):
@@ -79,39 +78,3 @@ class Pipe(object):
     def worker(self, item):
         for part in self.parts:
             item = part.run(item)
-            
-
-'''
-class Sprocket(object):
-    _args = []
-    _kwargs = []
-    # This has the unfortunate effect of rendering __init__.__doc__ useless
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-    
-    def _getarg(self, index):
-        return self.args[index]
-    def _setarg(self, index, value):
-        self.args[index] = value
-    def _getkwarg(self, name):
-        return self.kwargs[name]
-    def _setkwarg(self, name, value):
-        self.kwargs[name] = value
-    
-    @classmethod
-    def sprocket_argument(cls, **info):
-        cls._args.append(info)
-        return property(
-            fget=lambda self: self._getarg(len(self.args)-1),
-            fset=lambda self, value: self._setarg(len(self.args)-1, value)
-        )
-        
-    
-    @classmethod
-    def sprocket_option(cls, **info):
-        cls._kwargs.append(info)
-        return property(
-            fget=lambda self: self._getarg(info['name']),
-            fset=lambda self, value: self._setarg(info['name'], value))
-'''

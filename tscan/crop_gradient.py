@@ -1,6 +1,7 @@
 from crop import Region, Point
 import numpy
 import cli
+import code
 
 @cli.register
 class CropGradient(object):
@@ -19,13 +20,13 @@ class CropGradient(object):
         return meta
     
     def estimate(self, meta):
-        signed_gray = meta.data.sum(axis=2)
+        #signed_gray = meta.data.sum(axis=2)
+        signed_color = numpy.array(meta.data, dtype=numpy.int16)
         
         region = Region(Point(0, 0), Point(0, 0))
         for axis in [0, 1]:
-            signed_axis = signed_gray.sum(axis=axis)
             # Get derivatives
-            deriv_1 = numpy.diff(signed_axis)
+            deriv_1 = numpy.diff(signed_color, axis=axis).sum(axis=2).sum(axis=int(not axis))
             deriv_2 = numpy.diff(deriv_1)            
             # Now look for the pixels nearest to 0
             deriv_2_prev = numpy.roll(deriv_2, 1)

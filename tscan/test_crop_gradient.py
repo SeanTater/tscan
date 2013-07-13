@@ -21,5 +21,5 @@ class CropGradientTest(unittest.TestCase):
     def test_against_reference(self):
         for meta in tscantest.metas:
             region = CropGradient().estimate(meta)
-            self.assertTrue(region.almost(meta.reference_crop))
+            self.assertTrue(region.mean_distance(meta.reference_crop) < 25)
         

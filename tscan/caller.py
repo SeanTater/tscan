@@ -32,7 +32,7 @@ def call():
 
     # These all take "args" because of cli.register
     p_in = NameListSource(cli_args)
-    p_middle = plugin(cli_args)
+    p_middle = cli_args.plugin(cli_args)
     p_out = FileSink(cli_args)
     
     Pipe(p_in, p_middle, p_out).run()

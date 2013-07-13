@@ -19,9 +19,8 @@ class Point(object):
         else:
             self.y = v
     
-    def almost(self, pt, precision=10):
-        ''' Are these points almost equal? '''
-        return max(abs(self.y - pt.y), abs(self.x - pt.x)) < precision
+    def distance(self, pt):
+        return math.sqrt((self.y - pt.y)**2 + (self.x - pt.x)**2)
         
 
 class Region(object):
@@ -35,7 +34,5 @@ class Region(object):
         return "<Region ({start.y}, {start.x})->({stop.y}, {stop.x})>".format(
             start=self.start, stop=self.stop)
     
-    def almost(self, region, precision=10):
-        ''' Are these regions almost equal? '''
-        return (self.start.almost(region.start, precision)
-            and self.stop.almost(region.stop, precision))
+    def mean_distance(self, region):
+        return (self.start.distance(region.start) + self.stop.distance(region.stop)) / 2
