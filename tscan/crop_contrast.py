@@ -1,8 +1,8 @@
 import cli
 from crop import Region, Point
 
-@cli.default.register
-class CropContrast(object):
+@cli.Plugin.register
+class CropContrast(cli.Plugin):
     ''' Crop an image by searching for the region of highest contrast
         
         Works by repeated trimming, looking for the greatest contrast between
@@ -13,7 +13,7 @@ class CropContrast(object):
             doesn't make any effort to straighten unlevel images.
     '''
     _name = 'crop_contrast'
-    _args = [ dict(name='--warp', default=16,
+    _args = [ cli.Argument('--warp', default=16,
         help="Number of lines to skip per step before fine tuning."
             "Lower numbers are more accurate, higher is faster.") ]
     

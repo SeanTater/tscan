@@ -2,9 +2,10 @@ from crop import Region, Point
 import numpy
 import cli
 import code
+import cv2
 
-@cli.default.register
-class CropGradient(object):
+@cli.Plugin.register
+class CropGradient(cli.Plugin):
     ''' Crops out an image using lines of strongest gradient
         
         This method of cropping
@@ -21,13 +22,18 @@ class CropGradient(object):
     
     def estimate(self, meta):
         #signed_gray = meta.data.sum(axis=2)
-        signed_color = numpy.array(meta.data, dtype=numpy.int16)
+        signed_color = cv2.GaussianBlur(meta.data, (11, 11), 0) 
+        signed_color = numpy.array(signed_color, dtype=numpy.int16)
         
         region = Region(Point(0, 0), Point(0, 0))
         for axis in [0, 1]:
             # Get derivatives
             deriv_1 = numpy.diff(signed_color, axis=axis).sum(axis=2).sum(axis=int(not axis))
-            deriv_2 = numpy.diff(deriv_1)            
+            # Smooth
+            #cs = deriv_1.cumsum()
+            #cs = cs - numpy.roll(cs, 10)
+            deriv_2 = numpy.diff(deriv_1)
+            #code.interact(local=vars())
             # Now look for the pixels nearest to 0
             deriv_2_prev = numpy.roll(deriv_2, 1)
             deriv_2_next = numpy.roll(deriv_2, -1)

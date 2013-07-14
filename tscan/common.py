@@ -19,13 +19,10 @@ class ImageMeta(object):
     def data(self, data):
         self._data = data
 
-@cli.default.register
-class NameListSource(object):
+class NameListSource(cli.Plugin):
     ''' Creates new ImageMetas from a list of filenames
     
         It doesn't process the filenames, they're passed on raw. '''
-    _args = [ dict(name='filenames', metavar='filename', nargs='+', help='Input filenames') ]
-    _builtin = True
     
     def __init__(self, filenames):
         self.filenames = filenames
@@ -33,9 +30,8 @@ class NameListSource(object):
     def run(self):
         for filename in self.filenames:
             yield ImageMeta(filename)
-            
-@cli.default.register
-class FileSink(object):
+
+class FileSink(cli.Plugin):
     ''' Takes ImageMetas and saves them to new files
         
         You can either pass one filename, or a pattern.
@@ -44,8 +40,6 @@ class FileSink(object):
         path_noext -> Path, with directory name, no extension
         ext -> file extension, with dot
         path -> the whole path, fstart to finish'''
-    _args = [ dict(name='output_pattern', help='Output filename pattern') ]
-    _builtin = True
     
     def __init__(self, output_pattern="%(path_noext)s_out%(ext)s"):
         self.output_pattern = output_pattern
