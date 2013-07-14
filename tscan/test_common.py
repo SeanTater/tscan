@@ -41,21 +41,21 @@ class TestFileSink(unittest.TestCase):
         assert FileSink('foo').output_pattern == 'foo'
         assert FileSink().output_pattern == "%(path_noext)s_out%(ext)s"
     
-    def test_put(self):
+    def test_run(self):
         meta = ImageMeta('/path/to/foo.jpg')
-        meta.data = None
+        meta.data = 'example image data'
         
         fs_plain = FileSink('foo')
         fs_path = FileSink('%(path)s')
         fs_default = FileSink()
         with mock.patch('cv2.imwrite') as m:
-            fs_plain.put(meta)
-            fs_path.put(meta)
-            fs_default.put(meta)
+            fs_plain.run(meta)
+            fs_path.run(meta)
+            fs_default.run(meta)
             assert m.mock_calls == [
-                mock.call('foo', None),
-                mock.call('/path/to/foo.jpg', None),
-                mock.call('/path/to/foo_out.jpg', None)]
+                mock.call('foo', meta.data),
+                mock.call('/path/to/foo.jpg', meta.data),
+                mock.call('/path/to/foo_out.jpg', meta.data)]
 
 class TestPipe(unittest.TestCase):
     def test_create(self):

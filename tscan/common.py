@@ -3,6 +3,7 @@ import cv2
 import multiprocessing
 import futures
 import cli
+import code
 
 class ImageMeta(object):
     def __init__(self, filename):
@@ -23,7 +24,6 @@ class NameListSource(cli.Plugin):
     ''' Creates new ImageMetas from a list of filenames
     
         It doesn't process the filenames, they're passed on raw. '''
-    
     def __init__(self, filenames):
         self.filenames = filenames
     
@@ -44,16 +44,19 @@ class FileSink(cli.Plugin):
     def __init__(self, output_pattern="%(path_noext)s_out%(ext)s"):
         self.output_pattern = output_pattern
     
-    def run(self):
-        # Only act when others request it
-        pass
-    
-    def put(self, meta):
+    def run(self, meta):
         ''' Takes image (ImageMeta) and writes it to a file '''
         includes = {"path": meta.filename}
-        includes["path_noext"], includes["ext"] = os.path.splitext(meta.filename)
+        includes["path_noext"], includes["ext"] = os.path.splitext(meta.filename) 
         output = self.output_pattern % includes
-        return cv2.imwrite(output, meta.data)
+        cv2.imwrite(output, meta.data)
+
+
+class Progress(cli.Plugin):
+    def run(self, meta):
+        ''' Print progress information to the console '''
+        print 'Processing "%s"' %meta.filename
+        return meta
 
 class Pipe(object):
     # Adding 1 for IO waiting
