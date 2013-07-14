@@ -57,6 +57,11 @@ class TestFileSink(unittest.TestCase):
                 mock.call('/path/to/foo.jpg', meta.data),
                 mock.call('/path/to/foo_out.jpg', meta.data)]
 
+class TestProgress(unittest.TestCase):
+    def test_run(self):
+        # Can't really test print, settle for do no harm
+        assert Progress().run("example") == 'example'
+
 class TestPipe(unittest.TestCase):
     def test_create(self):
         p = Pipe('one', 'two', 'three')
