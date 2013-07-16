@@ -68,8 +68,9 @@ class Pipe(object):
     def run(self):
         # Load workers
         with futures.ThreadPoolExecutor(max_workers=self.max_workers) as e:
-            for item in self.source.run():
-                e.submit(self.worker, item)
+            for meta in e.map(self.worker, self.source.run()):
+                pass
+                # Yield in the future?? Could be useful.
                
     def worker(self, item):
         for part in self.parts:

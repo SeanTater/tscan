@@ -28,12 +28,30 @@ class CropGradient(cli.Plugin):
         region = Region(Point(0, 0), Point(0, 0))
         for axis in [0, 1]:
             # Get derivatives
+            deriv = numpy.diff(signed_color, axis=axis)
+            # One dimension, absolute
+            deriv = numpy.abs(deriv.sum(axis=2).sum(axis=int(not axis)))
+            # Non maximal surpression
+            deriv_prev = numpy.roll(deriv, 1)
+            deriv_next = numpy.roll(deriv, -1)
+            deriv_max = (deriv >= deriv_prev) & (deriv > deriv_next)
+            deriv_max_i = numpy.flatnonzero(deriv_max) # indexes into deriv_max
+            # Choose the best ones - this should be a pretty small list
+            best_derivs_ii = deriv[deriv_max].argsort() # indexes into deriv_max_i
+            region.start[axis] = deriv_max_i[best_derivs_ii[-1]]
+            region.stop[axis] = deriv_max_i[best_derivs_ii[-2]]
+            if region.start[axis] > region.stop[axis]:
+                region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
+        return region
+
+'''
+# Get derivatives
             deriv_1 = numpy.diff(signed_color, axis=axis).sum(axis=2).sum(axis=int(not axis))
             # Smooth
             #cs = deriv_1.cumsum()
             #cs = cs - numpy.roll(cs, 10)
             deriv_2 = numpy.diff(deriv_1)
-            #code.interact(local=vars())
+            code.interact(local=vars())
             # Now look for the pixels nearest to 0
             deriv_2_prev = numpy.roll(deriv_2, 1)
             deriv_2_next = numpy.roll(deriv_2, -1)
@@ -48,4 +66,4 @@ class CropGradient(cli.Plugin):
             region.stop[axis] = deriv_2_at_0_i[stop_ii]
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
-        return region
+'''

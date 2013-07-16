@@ -31,11 +31,11 @@ def call():
     parser = argparse.ArgumentParser()
     parser.add_argument('-o', '--output-pattern', help='Output filename or '
                         'pattern')
-    parser.add_argument('-p', '--progress', help='Give simple progress info')
+    parser.add_argument('-p', '--progress', action='store_true', help='Give simple progress info')
     
     parser.add_argument('filenames', metavar='filename', nargs='+', help='Input'
                         ' filenames')
-    
+    parser.add_argument('-w', '--max-workers', help='Maximum number of threads')
     subparsers = parser.add_subparsers(help="Plugins")
     # How to do this automatically?
     module_names = ['crop_contrast', 'crop_gradient']
@@ -64,5 +64,5 @@ def call():
     if cli_args.progress: parts.append(Progress())
     parts.append(cli_args.plugin.init_from_cli(cli_args))
     parts.append(FileSink(cli_args.output_pattern or "%(path_noext)s_out%(ext)s"))
-    
+    if cli_args.max_workers: Pipe.max_workers = cli_args.max_workers
     Pipe(*parts).run()

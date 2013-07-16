@@ -2,7 +2,6 @@ from common import ImageMeta
 import cv2
 import math
 
-
 # Oh Snap! Y then X?! Yes, that's life!
 class Point(object):
     def __init__(self, y, x):
@@ -32,7 +31,8 @@ class Region(object):
     
     def __repr__(self):
         return "<Region ({start.y}, {start.x})->({stop.y}, {stop.x})>".format(
-            start=self.start, stop=self.stop)
+               start=self.start, stop=self.stop)
     
     def mean_distance(self, region):
-        return (self.start.distance(region.start) + self.stop.distance(region.stop)) / 2
+        return (self.start.distance(region.start)
+                + self.stop.distance(region.stop)) / 2
