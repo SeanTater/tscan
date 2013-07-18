@@ -26,7 +26,7 @@ class CropGradientTest(unittest.TestCase):
             md = region.mean_distance(meta.reference_crop)
             distance.append(md)
             crop_log.default.dump(method='gradient',
-                         generated=region, reference=meta)
+                         generated=region, sample=meta)
         
         # It has to work on average
         assert sum(distance)/len(distance) < 50
