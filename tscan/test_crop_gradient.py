@@ -5,6 +5,7 @@ from mock import Mock
 from common import ImageMeta
 from crop_gradient import CropGradient
 from crop import Region, Point
+import crop_log
 import tscantest
 
 class CropGradientTest(unittest.TestCase):
@@ -24,7 +25,8 @@ class CropGradientTest(unittest.TestCase):
             region = CropGradient().estimate(meta)
             md = region.mean_distance(meta.reference_crop)
             distance.append(md)
-            assert md < 25
+            crop_log.default.dump(method='gradient',
+                         generated=region, sample=meta)
         
         # It has to work on average
         assert sum(distance)/len(distance) < 50
