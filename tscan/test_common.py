@@ -1,6 +1,6 @@
 import unittest
 import mock
-from common import ImageMeta, NameListSource, FileSink, Pipe
+from common import ImageMeta, NameListSource, FileSink, Pipe, Progress
 
 class TestImageMeta(unittest.TestCase):
     def test_create(self):
@@ -60,7 +60,9 @@ class TestFileSink(unittest.TestCase):
 class TestProgress(unittest.TestCase):
     def test_run(self):
         # Can't really test print, settle for do no harm
-        assert Progress().run("example") == 'example'
+        m = mock.Mock()
+        m.filename = "soandso"
+        assert Progress().run(m) is m
 
 class TestPipe(unittest.TestCase):
     def test_create(self):
