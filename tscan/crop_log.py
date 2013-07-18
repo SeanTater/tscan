@@ -45,10 +45,12 @@ class SQLog(object):
     
     def dump_region(self, region):
         sr = SRegion(
-            start_y = region.start.y,
-            start_x = region.start.x,
-            stop_y = region.stop.y,
-            stop_x = region.stop.x)
+            # type(region.*.{x,y}) == numpy.int64
+            # sqlalchemy supports only int, long
+            start_y = int(region.start.y),
+            start_x = int(region.start.x),
+            stop_y = int(region.stop.y),
+            stop_x = int(region.stop.x))
         self.session.add(sr)
         return sr
     
@@ -58,7 +60,8 @@ class SQLog(object):
         if sample:
             return sample
         else:
-            sample = SSample(name=meta.basename)
+            region = self.dump_region(meta.reference_crop)
+            sample = SSample(name=meta.basename, reference_crop=region)
             self.session.add(sample)
             return sample
     
@@ -68,6 +71,6 @@ class SQLog(object):
             date=datetime.datetime.utcnow(),
             method=method,
             generated=self.dump_region(generated),
-            reference=self.dump_sample(sample))
+            sample=self.dump_sample(sample))
 
 default = SQLog()
