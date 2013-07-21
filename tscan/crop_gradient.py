@@ -20,11 +20,16 @@ class CropGradient(cli.Plugin):
         region = self.estimate(meta)
         meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
         return meta
+    
     #
     # Score: Take image data (as in ImageMeta().data) and yield two 1d arrays
     #        relating to probability that the line contains a relevant edge
-    #
+    
     def score_deriv(self, idata):
+        ''' Estimate likelihood of an edge by taking directional derivatives
+            idata: ImageMeta().data
+            yields: 1d integer numpy array for each axis, y then x
+        '''
         idata = numpy.array(idata, dtype=numpy.int16)
         for axis in [0, 1]:
             # Color derivative
@@ -34,6 +39,10 @@ class CropGradient(cli.Plugin):
             yield deriv
     
     def score_canny(self, idata):
+        ''' Estimate likelihood of an edge by summing Canny edge response.
+            idata: ImageMeta().data
+            yields: 1d integer numpy array for each axis, y then x
+        '''
         # Percentile is really slow (~1s runtime for a usual image)
         # Since this is a heuristic anyway, just base it on a 1% sample
         # 101 -> prime is better to avoid hatching
