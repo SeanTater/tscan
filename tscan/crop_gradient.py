@@ -3,6 +3,7 @@ import numpy
 import cli
 import code
 import cv2
+import numpy
 
 @cli.Plugin.register
 class CropGradient(cli.Plugin):
@@ -20,8 +21,56 @@ class CropGradient(cli.Plugin):
         meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
         return meta
     
+    def score_deriv(self, idata):
+        idata = numpy.array(idata, dtype=numpy.int16)
+        for axis in [0, 1]:
+            # Color derivative
+            deriv = numpy.diff(idata, axis=axis)
+            # One dimension, absolute
+            deriv = numpy.abs(deriv.sum(axis=2).sum(axis=int(not axis)))
+            yield deriv
+    
+    def score_canny(self, idata):
+        # Percentile is really slow (~1s runtime for a usual image)
+        # Since this is a heuristic anyway, just base it on a 1% sample
+        # 101 -> prime is better to avoid hatching
+        sample=idata.flatten()[::101]
+        low = numpy.percentile(sample, 20)
+        high = numpy.percentile(sample, 80)
+        
+        imc = cv2.Canny(idata, low, high)
+        for axis in [0, 1]:
+            yield imc.sum(axis=axis)
+        
+    def local_max_1d(self, arr):
+        ''' Return indices of local maxima in arr, sorted by impulse '''
+        maxima = (arr[1:-1] > arr[2:]) & (arr[1:-1] > arr[:-2])
+        maxima = numpy.flatnonzero(maxima) + 1
+        
+        # Sort local maxima
+        maxima_i = arr[maxima].argsort()
+        return maxima[maxima_i] 
+    
+    def region_impulse(self, y_maxima, x_maxima):
+        ''' Use the top two results in each axis to generate a cropping region 
+            y_maxima: indices of greatest impulse, sorted by impulse
+            x_maxima: same as y_maxima, can be a different length '''
+        region = Region(Point(0, 0), Point(0, 0))
+        for axis, maxima in enumerate([y_maxima, x_maxima]): 
+            region.start[axis] = maxima[-1]
+            region.stop[axis] = maxima[-2]
+            if region.start[axis] > region.stop[axis]:
+                region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
+        return region
+    
     def estimate(self, meta):
-        #signed_gray = meta.data.sum(axis=2)
+        ''' Generate an estimated crop region given ImageMeta '''
+        axes = tuple(self.score_canny(meta.data))
+        maxima = [self.local_max_1d(axis) for axis in axes]
+        region = self.region_impulse(maxima[0], maxima[1])
+        return region
+
+''' Version 2
         signed_color = cv2.GaussianBlur(meta.data, (11, 11), 0) 
         signed_color = numpy.array(signed_color, dtype=numpy.int16)
         
@@ -43,8 +92,9 @@ class CropGradient(cli.Plugin):
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
         return region
-
 '''
+
+''' Version 1
 # Get derivatives
             deriv_1 = numpy.diff(signed_color, axis=axis).sum(axis=2).sum(axis=int(not axis))
             # Smooth
