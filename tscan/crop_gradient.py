@@ -67,7 +67,7 @@ class CropGradient(cli.Plugin):
         maxima = numpy.flatnonzero(maxima) + 1
         
         # Sort local maxima
-        maxima = maxima[impulse[maxima].argsort()]
+        maxima = maxima[impulse[maxima].argsort()[::-1]]
         
         return numpy.column_stack((maxima, impulse[maxima]))
     
@@ -81,15 +81,52 @@ class CropGradient(cli.Plugin):
             x_maxima: same as y_maxima, can be a different length '''
         region = Region(Point(0, 0), Point(0, 0))
         for axis, maxima in enumerate([y_maxima, x_maxima]): 
-            region.start[axis] = maxima[-1,0]
-            region.stop[axis] = maxima[-2,0]
+            region.start[axis] = maxima[0,0]
+            region.stop[axis] = maxima[1,0]
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
         return region
+    
+    def region_aspect(self, y_maxima, x_maxima):
+        ''' Choose the best region to cut based on aspect ratio and area
+            y_maxima: (index, impulse[index]) of greatest impulse, sorted
+            x_maxima: same as y_maxima, can be a different length '''
+        TOP_N = 10
+        top_x = min(TOP_N, len(x_maxima))
+        top_y = min(TOP_N, len(y_maxima))
+        bscore = 0
+        bsy = bey = bsx = bex = 0
+        for syi in range(top_y):
+            for eyi in range(syi+1, top_y):
+                for sxi in range(top_x):
+                    for exi in range(sxi+1, top_x):
+                        sy, sy_impulse = y_maxima[syi]
+                        ey, ey_impulse = y_maxima[eyi]
+                        if sy > ey:
+                            sy, sy_impulse, ey, ey_impulse = ey, ey_impulse, sy, sy_impulse
+                        sx, sx_impulse = x_maxima[sxi]
+                        ex, ex_impulse = x_maxima[exi]
+                        if sx > ex:
+                            sx, sx_impulse, ex, ex_impulse = ex, ex_impulse, sx, sx_impulse
+                        
+                        h, w = ey-sy, ex-sx
+                        impulse = sy_impulse + sx_impulse + ey_impulse + ex_impulse
+                        aspect = min(h, w) / max(h, w)
+                        
+                        area = h*w
+                        
+                        #print "a %i, i %i" %(area, impulse)
+                        
+                        score = area * impulse
+                        if score > bscore:
+                            bscore = score
+                            bsy, bey, bsx, bex = sy, ey, sx, ex
+        
+        return Region(Point(bsy, bsx), Point(bey, bex))
     
     def estimate(self, meta):
         ''' Generate an estimated crop region given an ImageMeta '''
         axes = tuple(self.score_canny(meta.data))
         maxima = [self.local_max_1d(axis) for axis in axes]
-        region = self.region_impulse(maxima[0], maxima[1])
+        region = self.region_aspect(maxima[0], maxima[1])
         return region

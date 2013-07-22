@@ -18,6 +18,9 @@ class Point(object):
         else:
             self.y = v
     
+    def __eq__(self, pt):
+        return self.y == pt.y and self.x == pt.x
+    
     def distance(self, pt):
         return math.sqrt((self.y - pt.y)**2 + (self.x - pt.x)**2)
         
@@ -32,6 +35,9 @@ class Region(object):
     def __repr__(self):
         return "<Region ({start.y}, {start.x})->({stop.y}, {stop.x})>".format(
                start=self.start, stop=self.stop)
+    
+    def __eq__(self, r):
+        return self.start == r.start and self.stop == r.stop
     
     def mean_distance(self, region):
         return (self.start.distance(region.start)
