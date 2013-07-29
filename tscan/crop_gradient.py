@@ -87,6 +87,10 @@ class CropGradient(cli.Plugin):
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
         return region
     
+    def combine(self, a, b):
+        ''' Generate the unique combinations of a and b's cartesian product '''
+        pass
+    
     def region_aspect(self, y_maxima, x_maxima):
         ''' Choose the best region to cut based on aspect ratio and area
             y_maxima: (index, impulse[index]) of greatest impulse, sorted
@@ -96,6 +100,8 @@ class CropGradient(cli.Plugin):
         top_y = min(TOP_N, len(y_maxima))
         bscore = 0
         bsy = bey = bsx = bex = 0
+        
+        # Generate combinations of y's and x's
         for syi in range(top_y):
             for eyi in range(syi+1, top_y):
                 for sxi in range(top_x):
