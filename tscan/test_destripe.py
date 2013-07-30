@@ -23,10 +23,9 @@ class TestDestripe(unittest.TestCase):
             numpy.array([0, 0, 3, 0]))
         
     def test_noise_threshold(self):
-        shape = (7, 100, 3)
         noise = numpy.array([10, 50, 75, 12, 100, 2, 0])
         assert numpy.array_equal(
-            self.destripe.noise_threshold(shape, noise),
+            self.destripe.noise_threshold(noise),
             numpy.array([False, False, True, False, True, False, False]))
         
     def test_noise_mask(self):

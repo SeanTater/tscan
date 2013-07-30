@@ -1,5 +1,6 @@
 import numpy
 import scipy.ndimage
+import scipy.signal
 import cv2
 import cli
 import code
@@ -28,48 +29,28 @@ class Destripe(cli.Plugin):
         noise =  noise.sum(axis=1)
         return noise
     
-    def noise_threshold(self, shape, noise, threshold=0.5):
-        ''' Threshold the sum of noise on a line according to a percentage of
-            the other dimension. Note that the color images are multiplied'''
-        return numpy.array(noise, dtype=float) / shape[1] > threshold
+    def noise_threshold(self, noise, z=2):
+        ''' Pick out lines whose scores are more than z stdev from the local
+            width-5 median'''
+        local_median = scipy.signal.medfilt(noise, kernel_size=5)
+        return numpy.abs(noise - local_median) > z*numpy.std(noise)
     
-    def noise_mask(self, image):
+    def noise_mask(self, image, low=5, high=5, threshold=0.5):
         # This change isn't permanent, it's local to this function
         image = cv2.cvtColor(image, cv2.cv.CV_BGR2HSV)
         iroll = numpy.swapaxes(image, 0, 1)
         y_stripes = self.neighbor_threshold(image)
         x_stripes = self.neighbor_threshold(iroll)
         
-        y_stripes = self.noise_threshold(image.shape, y_stripes)
-        x_stripes = self.noise_threshold(iroll.shape, x_stripes)
+        y_stripes = self.noise_threshold(y_stripes)
+        x_stripes = self.noise_threshold(x_stripes)
+        #code.interact(local=vars())
         y_stripes, x_stripes = numpy.meshgrid(x_stripes, y_stripes)
         return y_stripes | x_stripes
     
     def run(self, meta):
         mask = self.noise_mask(meta.data)
-        code.interact(local=vars())
         # Inpaint radius = 3, acceptable?
         cv2.inpaint(meta.data, numpy.array(mask, dtype=numpy.uint8), 3,
                     cv2.INPAINT_NS)
         return meta
-    
-'''      V1    
-        mask = numpy.zeros(meta.data.shape[:-1], dtype=numpy.uint8)
-        fix_lines = [None, None]
-        for axis in [0, 1]:
-            # It's easier to move the axes than to try to slice it
-            image = numpy.rollaxis(meta.data, axis)
-            a_minus_c = numpy.abs(image[:-2] - image[2:]) # indexes A's
-            a_minus_b = numpy.abs(image[:-1] - image[1:])[:-1] # indexes A's
-            
-            # Select affected pixels
-            fix_pixels = (a_minus_c < low) & (a_minus_b > high)
-            # Now sum the bools in lines, apply a threshold, index B's
-            pixel_threshold = image.shape[0] / 4 # n/?   ?=a guess 
-            fix_lines[axis] = fix_pixels.sum(axis=2).sum(axis=1)
-            fix_lines[axis] = numpy.flatnonzero(fix_lines[axis] > pixel_threshold) + 1
-            
-        # Paint it on the mask
-        mask[fix_lines[0]] = 1
-        mask[:, fix_lines[1]] = 1
-'''
