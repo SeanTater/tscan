@@ -7,11 +7,9 @@ Requirements
 ------------
 It's not on PyPI yet. (It's not complete enough)
 
-But when it does become available, you will need to install _opencv2_. Not
-pyopencv, or opencv-cython - but the one actually part of the opencv project.
-
-On Ubuntu, you can install it via
-    sudo apt-get install python-opencv
+Requires:
+    OpenCV (official python binding) (apt: python-opencv)
+    GExiv2 (apt: gir1.2-gexiv2-0.4, may vary)
 
 Then in the source package, 
     ./setup.py install
