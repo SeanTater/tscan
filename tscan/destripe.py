@@ -24,7 +24,7 @@ class Destripe(cli.Plugin):
         noise = numpy.abs((gauss - image)/gauss).sum(axis=2).sum(axis=1)
         return noise
     
-    def noise_threshold(self, noise, z=0.5):
+    def noise_threshold(self, noise, z=1):
         ''' Pick out lines whose scores are more than z stdev from the local
             width-5 median'''
         local_median = scipy.signal.medfilt(noise, kernel_size=5)
@@ -49,22 +49,3 @@ class Destripe(cli.Plugin):
                     cv2.INPAINT_NS)
         code.interact(local=vars())
         return meta
-    
-"""
-    def neighbor_threshold(self, image, low=5, high=5):
-        ''' Search for one pixel wide anomalies on the first axis
-            Think of every line like this:
-             A B C
-            abs(A-C) is low
-            abs(A-B) is high
-            abs(C-B) is high
-        '''
-        image = numpy.array(image, dtype=numpy.int16)
-        neighbor1_diff = scipy.ndimage.filters.convolve1d(image, [-1, 2, -1], axis=0)
-        neighbor2_diff = scipy.ndimage.filters.convolve1d(image, [ 1, 0, -1], axis=0)
-        noise =  numpy.abs(neighbor1_diff) > high
-        noise &= numpy.abs(neighbor2_diff) < low
-        noise =  noise.sum(axis=2) > 0 # Don't triple count colors
-        noise =  noise.sum(axis=1)
-        return noise
-"""

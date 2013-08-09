@@ -3,12 +3,19 @@ import cv2
 import multiprocessing
 import futures
 import cli
-import code
+import sys
+
+try:
+    from gi.repository import GExiv2 as exiv
+except ImportError:
+    print "GExiv2 is missing. Consider installing gir*-gexiv2* or the like"
+    sys.exit()
 
 class ImageMeta(object):
     def __init__(self, filename):
         self.filename = filename
         self._data = None
+        self.exiv = exiv.Metadata(filename)
     
     @property
     def data(self):
@@ -49,7 +56,13 @@ class FileSink(cli.Plugin):
         includes = {"path": meta.filename}
         includes["path_noext"], includes["ext"] = os.path.splitext(meta.filename) 
         output = self.output_pattern % includes
+        # Write image data
         cv2.imwrite(output, meta.data)
+        # Write image metadata
+        new_image = exiv.Metadata(output)
+        for key in meta.exiv:
+            new_image[key] = meta.exiv[key]
+        new_image.save_file()
 
 
 class Progress(cli.Plugin):

@@ -18,6 +18,7 @@ class CropGradient(cli.Plugin):
     _args = []
     def run(self, meta):
         region = self.estimate(meta)
+        code.interact(local=vars())
         meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
         return meta
     
@@ -86,11 +87,7 @@ class CropGradient(cli.Plugin):
             if region.start[axis] > region.stop[axis]:
                 region.start[axis], region.stop[axis] = region.stop[axis], region.start[axis]
         return region
-    
-    def combine(self, a, b):
-        ''' Generate the unique combinations of a and b's cartesian product '''
-        pass
-    
+       
     def region_aspect(self, y_maxima, x_maxima):
         ''' Choose the best region to cut based on aspect ratio and area
             y_maxima: (index, impulse[index]) of greatest impulse, sorted
