@@ -18,7 +18,6 @@ class CropGradient(cli.Plugin):
     _args = []
     def run(self, meta):
         region = self.estimate(meta)
-        code.interact(local=vars())
         meta.data = meta.data[region.start.y:region.stop.y, region.start.x:region.stop.x]
         return meta
     

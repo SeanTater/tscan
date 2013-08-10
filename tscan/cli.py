@@ -38,7 +38,7 @@ def call():
     parser.add_argument('-w', '--max-workers', help='Maximum number of threads')
     subparsers = parser.add_subparsers(help="Plugins")
     # How to do this automatically?
-    module_names = ['crop_contrast', 'crop_gradient', 'destripe']
+    module_names = ['crop_contrast', 'crop_gradient', 'crop_local', 'destripe']
 
     # It would be great if we didn't have to load all of these every time
     for module_name in module_names:
