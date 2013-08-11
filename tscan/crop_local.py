@@ -3,11 +3,12 @@ import numpy
 import cli
 import code
 import cv2
+import os
 from scipy import ndimage as scind
 
 @cli.Plugin.register
 class CropLocal(cli.Plugin):
-    ''' Crops out an image using lines of strongest gradient
+    ''' Crops out an image by looking for a single region of low uniformity
         
         This method of cropping
             is moderately slow,
@@ -26,23 +27,18 @@ class CropLocal(cli.Plugin):
     #        relating to the axial contrast on the line
     
     def score_gauss(self, idata):
-        ''' Find the difference between a point and its very wide gaussian
+        ''' Find the difference between a point and its gaussian
             idata: ImageMeta().data
             yields: 1d integer numpy array for each axis, y then x
         '''
-        idata = numpy.array(idata, dtype=numpy.int16)
+        
+        idata = cv2.cvtColor(idata, cv2.cv.CV_BGR2Lab)
+        contrast = cv2.blur(idata, (5, 5))
+        idata = numpy.array(idata, dtype=numpy.int16) # handle subtract
         for axis in [1, 0]:
-            # The sum and gauss are purpendicular to the axis of interest
-            # if scipy
-            #  contrast = scind.gaussian_filter1d(idata, 10, axis=axis)
-            # elif opencv
-            size = [1, 1]
-            size[axis] = 25
-            size = tuple(size)
-            contrast = cv2.GaussianBlur(idata, size, 0)
-            # end
-            contrast = numpy.abs(idata - contrast).sum(axis=2).sum(axis=axis)
-            yield contrast
+            # The sum is purpendicular to the axis of interest
+            impulse = numpy.abs(idata - contrast).sum(axis=2).sum(axis=axis)
+            yield scind.median_filter(impulse, 5)
     
     #
     # Local max: Search for local maxima, prepare for cutting regions
@@ -53,7 +49,6 @@ class CropLocal(cli.Plugin):
             impulse: any 1D numpy array
             returns:
                 threshold'''
-        
         count, edge = numpy.histogram(impulse, 250)
         count = numpy.array(count, dtype=int)
         edge = numpy.array(edge[1:], dtype=int)
