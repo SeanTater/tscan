@@ -33,12 +33,13 @@ class CropLocal(cli.Plugin):
         '''
         
         idata = cv2.cvtColor(idata, cv2.cv.CV_BGR2Lab)
-        contrast = cv2.blur(idata, (10, 10))
-        idata = numpy.array(idata, dtype=numpy.int16) # handle subtract
+        big = numpy.array(cv2.blur(idata, (11, 11)), dtype=numpy.int16)
+        little = numpy.array(cv2.blur(idata, (3, 3)), dtype=numpy.int16)
+        #idata = numpy.array(idata, dtype=numpy.int16) # handle subtract
         for axis in [1, 0]:
             # The sum is purpendicular to the axis of interest
-            impulse = numpy.abs(idata - contrast).sum(axis=2).sum(axis=axis)
-            yield scind.median_filter(impulse, 5)
+            impulse = numpy.abs(little - big).sum(axis=2).sum(axis=axis)
+            yield scind.median_filter(impulse, 15)
     
     #
     # Local max: Search for local maxima, prepare for cutting regions

@@ -85,13 +85,13 @@ class Pipe(object):
             #for s in self.source.run():
             #    f.append( e.submit(self.worker, s) )
             #    f[-1].exception()
-            pass
-            #for meta in e.map(self.worker, self.source.run()):
-            #    pass
-            #    # Yield in the future?? Could be useful.
+                
+            for meta in e.map(self.worker, self.source.run()):
+                pass
+                # Yield in the future?? Could be useful.
         
-        for meta in self.source.run():
-            self.worker(meta)
+        #for meta in self.source.run():
+        #    self.worker(meta)
                
     def worker(self, item):
         for part in self.parts:
