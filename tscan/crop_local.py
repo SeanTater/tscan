@@ -40,6 +40,7 @@ class CropLocal(cli.Plugin):
             # The sum is purpendicular to the axis of interest
             impulse = numpy.abs(little - big).sum(axis=2).sum(axis=axis)
             yield scind.median_filter(impulse, 15)
+            #yield impulse
     
     #
     # Local max: Search for local maxima, prepare for cutting regions
@@ -50,9 +51,16 @@ class CropLocal(cli.Plugin):
             impulse: any 1D numpy array
             returns:
                 threshold'''
+        # Pre-otsu: make a histogram
+        #
         count, edge = numpy.histogram(impulse, 250)
         count = numpy.array(count, dtype=int)
         edge = numpy.array(edge[1:], dtype=int)
+        # Trim to the bottom 90% (avoid the photo edges)
+        count[-25:] = 0
+        
+        # Otsu (easier to vectorize with a histogram)
+        #
         weight = count * edge
         weight_under = weight.cumsum()
 
