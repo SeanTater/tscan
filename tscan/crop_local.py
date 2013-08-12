@@ -35,12 +35,11 @@ class CropLocal(cli.Plugin):
         idata = cv2.cvtColor(idata, cv2.cv.CV_BGR2Lab)
         big = numpy.array(cv2.blur(idata, (11, 11)), dtype=numpy.int16)
         little = numpy.array(cv2.blur(idata, (3, 3)), dtype=numpy.int16)
-        #idata = numpy.array(idata, dtype=numpy.int16) # handle subtract
         for axis in [1, 0]:
             # The sum is purpendicular to the axis of interest
-            impulse = numpy.abs(little - big).sum(axis=2).sum(axis=axis)
-            yield scind.median_filter(impulse, 15)
-            #yield impulse
+            impulse = numpy.sqrt(((little-big)**2).sum(axis=2)).sum(axis=axis)
+            #yield scind.median_filter(impulse, 3)
+            yield impulse
     
     #
     # Local max: Search for local maxima, prepare for cutting regions
@@ -53,11 +52,13 @@ class CropLocal(cli.Plugin):
                 threshold'''
         # Pre-otsu: make a histogram
         #
+        # Trim to the bottom 95%
+        impulse[impulse > numpy.percentile(impulse, 95)] = impulse.mean()
         count, edge = numpy.histogram(impulse, 250)
         count = numpy.array(count, dtype=int)
         edge = numpy.array(edge[1:], dtype=int)
         # Trim to the bottom 90% (avoid the photo edges)
-        count[-25:] = 0
+        #count[-25:] = 0
         
         # Otsu (easier to vectorize with a histogram)
         #
